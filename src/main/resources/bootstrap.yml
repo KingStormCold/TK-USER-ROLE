@@ -1,0 +1,31 @@
+logging:
+  file: /var/log/easycredit/tk-user-role-dev.log
+
+spring:
+  application:
+    name: tk-user-role-dev
+  datasource:
+    url: jdbc:postgresql://localhost:5432/tk_ouath_security
+    driverClassName: org.postgresql.Driver
+    username: tk_ouath
+    password: Rh6YYLv526
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      naming-strategy: org.hibernate.cfg.EJB3NamingStrategy
+#      ddl-auto: create
+      ddl-auto: update
+    properties:
+      hibernate.jdbc.lob.non_contextual_creation: true
+      
+security:
+  oauth2:
+    client:
+      client-id: tk_user_role
+      authorized-grant-types: password
+      client-secret: 123456
+    resource:
+      token-info-uri: http://localhost:8095/oauth/check_token
+      id: tk_user_role_id
+server:
+  port: 8080
