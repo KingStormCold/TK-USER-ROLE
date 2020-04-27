@@ -65,10 +65,10 @@ public class UserService {
 				message = SuccessEnum.UPDATE_USER.getValue();
 			}
 			userRepository.save(userConverter.convertToEntity(userDto));
-			return new ResultResponse<String>(HttpsStatusEnum._200.getKey(), message);
+			return new ResultResponse<>(HttpsStatusEnum._200.getKey(), message);
 		} catch (Exception e) {
 			log.info("Insert-Update exception...", e.toString(), e);
-			return new ResultResponse<String>(HttpsStatusEnum._500.getKey(), HttpsStatusEnum._500.getValue());
+			return new ResultResponse<>(HttpsStatusEnum._500.getKey(), HttpsStatusEnum._500.getValue());
 		}
 	}
 	
@@ -78,7 +78,7 @@ public class UserService {
 			if (StringUtils.isEmpty(userDto)) {
 				return new ResultResponse<>(HttpsStatusEnum._200.getKey(), FailEnum.NOT_FOUND_USER.getValue());
 			}
-			return new ResultResponse<UserDto>(HttpsStatusEnum._200.getKey(), HttpsStatusEnum._200.getValue(), userDto);
+			return new ResultResponse<>(HttpsStatusEnum._200.getKey(), HttpsStatusEnum._200.getValue(), userDto);
 		} catch (Exception e) {
 			log.info("Insert-Update exception...", e.toString(), e);
 			return new ResultResponse<>(HttpsStatusEnum._500.getKey(), HttpsStatusEnum._500.getValue());
@@ -87,7 +87,7 @@ public class UserService {
 	
 	public UserDto findById(final String userName) {
 		Optional<UserEntity> entity = userRepository.findById(userName);
-		if (entity.isPresent()) {
+		if (!entity.isPresent()) {
 			return null;
 		}
 		return userConverter.convertToDto(entity.get());

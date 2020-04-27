@@ -30,5 +30,4 @@ public class InsertUpdateUserRequest {
 	
 	@JsonProperty("roles")
 	private List<String> roles;
-	
 }

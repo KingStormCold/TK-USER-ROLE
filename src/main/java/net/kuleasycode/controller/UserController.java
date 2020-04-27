@@ -5,7 +5,9 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.extern.slf4j.Slf4j;
@@ -33,17 +35,17 @@ public class UserController {
 	}
 	
 	@PreAuthorize("hasAuthority('TK-INSERT-UPDATE-USER')")
-	@GetMapping(value = "/users/insert-update")
+	@PostMapping(value = "/users/insert-update")
 	public ResultResponse<String> insertUpdate(@Valid @RequestBody InsertUpdateUserRequest request) {
 		String userRequest = AuthenticationRequestInfo.getNewInstance().getUserName();
 		String json = JsonUtil.convertObjectToJson(request);
-		log.info(userRequest + " ......insert-update..." + json);
+		log.info(userRequest + " ...insert-update... " + json);
 		return userService.insertUpdateUser(request, userRequest);
 	}
 	
-	@PreAuthorize("hasAuthority('TK-INSERT-UPDATE-USER')")
+	@PreAuthorize("hasAuthority('TK-GET-USER')")
 	@GetMapping(value = "/users/get-user")
-	public ResultResponse<UserDto> getUser(String userName) {
+	public ResultResponse<UserDto> getUser(@RequestParam("user-name") String userName) {
 		String userRequest = AuthenticationRequestInfo.getNewInstance().getUserName();
 		log.info("get user info " + userName + " by " + userRequest);
 		return userService.getUser(userName);
