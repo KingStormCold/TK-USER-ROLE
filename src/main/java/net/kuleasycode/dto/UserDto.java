@@ -1,20 +1,19 @@
 package net.kuleasycode.dto;
 
 import java.util.Date;
-import java.util.List;
+import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+import net.kuleasycode.entity.RoleEntity;
 import net.kuleasycode.request.user.InsertUpdateUserRequest;
 import net.kuleasycode.utils.PasswordUtil;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
+@Getter
+@Setter
 public class UserDto {
 
 	@JsonProperty("user_name")
@@ -50,7 +49,11 @@ public class UserDto {
 	private boolean enabled;
 	
 	@JsonProperty("roles")
-	private List<RoleDto> roleEntities;
+	private Set<RoleEntity> rolesOauth;
+	
+	public UserDto() {
+		
+	}
 	
 	public static UserDto insert(final InsertUpdateUserRequest request, final String userRequest) {
 		UserDto userDto = new UserDto();

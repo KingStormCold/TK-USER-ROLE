@@ -1,27 +1,25 @@
 package net.kuleasycode.entity;
 
 import java.util.Date;
-import java.util.List;
+import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.Type;
 
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(name = "user_entity")
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
+@Getter
+@Setter
 public class UserEntity {
 
 	@Id
@@ -56,6 +54,8 @@ public class UserEntity {
 	@Type(type = "org.hibernate.type.NumericBooleanType")
 	private boolean enabled = true;
 	
-	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "userOauth")
-	private List<RoleEntity> roleEntities;
+	@ManyToMany(mappedBy = "userOauth")
+	@Fetch(value=FetchMode.SELECT)
+	private Set<RoleEntity> rolesOauth;
+	
 }
