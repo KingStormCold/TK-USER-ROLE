@@ -5,6 +5,7 @@ import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
@@ -54,7 +55,7 @@ public class UserEntity {
 	@Type(type = "org.hibernate.type.NumericBooleanType")
 	private boolean enabled = true;
 	
-	@ManyToMany(mappedBy = "userOauth")
+	@ManyToMany(mappedBy = "userOauth", fetch = FetchType.LAZY)
 	@Fetch(value=FetchMode.SELECT)
 	private Set<RoleEntity> rolesOauth;
 	

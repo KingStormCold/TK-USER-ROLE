@@ -1,7 +1,9 @@
 package net.kuleasycode.service;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
@@ -12,6 +14,7 @@ import org.springframework.util.StringUtils;
 
 import lombok.extern.slf4j.Slf4j;
 import net.kuleasycode.converter.UserConverter;
+import net.kuleasycode.dto.RoleDto;
 import net.kuleasycode.dto.UserDto;
 import net.kuleasycode.entity.UserEntity;
 import net.kuleasycode.enumclass.FailEnum;
@@ -20,6 +23,7 @@ import net.kuleasycode.enumclass.SuccessEnum;
 import net.kuleasycode.request.user.InsertUpdateUserRequest;
 import net.kuleasycode.response.ResultResponse;
 import net.kuleasycode.response.user.AllUserResponse;
+import net.kuleasycode.response.user.UserDetailResponse;
 import net.kuleasycode.response.user.UserInfoResponse;
 import net.kuleasycode.respository.IUserRepository;
 
@@ -33,6 +37,9 @@ public class UserService {
 
 	@Autowired
 	private UserConverter userConverter;
+	
+	@Autowired
+	private RoleService roleService;
  
 	public ResultResponse<AllUserResponse> findAllUser() {
 		//method reference java8
@@ -65,6 +72,12 @@ public class UserService {
 				message = SuccessEnum.UPDATE_USER.getValue();
 			}
 			userRepository.save(userConverter.convertToEntity(userDto));
+			for (String roleId : request.getRoles()) {
+				if (countUserRole(roleId, userDto.getUserName()) != 0) {
+					continue;
+				}
+				insertUserRole(roleId, userDto.getUserName());
+			}
 			return new ResultResponse<>(HttpsStatusEnum._200.getKey(), message);
 		} catch (Exception e) {
 			log.info("Insert-Update exception...", e.toString(), e);
@@ -72,13 +85,20 @@ public class UserService {
 		}
 	}
 	
-	public ResultResponse<UserDto> getUser(final String userName) {
+	public ResultResponse<UserDetailResponse> getUser(final String userName) {
 		try {
 			UserDto userDto = findById(userName);
 			if (StringUtils.isEmpty(userDto)) {
 				return new ResultResponse<>(HttpsStatusEnum._200.getKey(), FailEnum.NOT_FOUND_USER.getValue());
 			}
-			return new ResultResponse<>(HttpsStatusEnum._200.getKey(), HttpsStatusEnum._200.getValue(), userDto);
+			Set<RoleDto> roles = new HashSet<>();
+			for (RoleDto roleDto : userDto.getRolesOauth()) {
+				RoleDto item = new RoleDto(roleDto.getRoleId(), roleDto.getDesciption(), null);
+				roles.add(item);
+			}
+			UserDetailResponse response = UserDetailResponse.of(userDto);
+			response.setRolesOauth(roles);
+			return new ResultResponse<>(HttpsStatusEnum._200.getKey(), HttpsStatusEnum._200.getValue(), response);
 		} catch (Exception e) {
 			log.info("Insert-Update exception...", e.toString(), e);
 			return new ResultResponse<>(HttpsStatusEnum._500.getKey(), HttpsStatusEnum._500.getValue());
@@ -91,5 +111,13 @@ public class UserService {
 			return null;
 		}
 		return userConverter.convertToDto(entity.get());
+	}
+	
+	public void insertUserRole(final String roleId, final String userName) {
+		userRepository.insertUserRole(roleId, userName);
+	}
+	
+	public int countUserRole(final String roleId, final String userName) {
+		return userRepository.countUserRole(roleId, userName);
 	}
 }

@@ -1,6 +1,8 @@
 package net.kuleasycode.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,6 +20,7 @@ public class ResultResponse<T> {
 	private String responseMessage;
 	
 	@JsonProperty("data")
+	@JsonInclude(Include.NON_NULL)
 	private T data;
 
 	public ResultResponse(String responseCode, String responseMessage) {

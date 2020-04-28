@@ -11,10 +11,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.extern.slf4j.Slf4j;
-import net.kuleasycode.dto.UserDto;
 import net.kuleasycode.request.user.InsertUpdateUserRequest;
 import net.kuleasycode.response.ResultResponse;
 import net.kuleasycode.response.user.AllUserResponse;
+import net.kuleasycode.response.user.UserDetailResponse;
 import net.kuleasycode.service.UserService;
 import net.kuleasycode.utils.AuthenticationRequestInfo;
 import net.kuleasycode.utils.JsonUtil;
@@ -45,7 +45,7 @@ public class UserController {
 	
 	@PreAuthorize("hasAuthority('TK-GET-USER')")
 	@GetMapping(value = "/users/get-user")
-	public ResultResponse<UserDto> getUser(@RequestParam("user-name") String userName) {
+	public ResultResponse<UserDetailResponse> getUser(@RequestParam("user-name") String userName) {
 		String userRequest = AuthenticationRequestInfo.getNewInstance().getUserName();
 		log.info("get user info " + userName + " by " + userRequest);
 		return userService.getUser(userName);
