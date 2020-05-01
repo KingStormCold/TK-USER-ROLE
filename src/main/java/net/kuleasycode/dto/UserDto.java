@@ -1,6 +1,7 @@
 package net.kuleasycode.dto;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 import lombok.Getter;
@@ -34,6 +35,8 @@ public class UserDto {
 	
 	private Set<RoleDto> rolesOauth;
 	
+	private List<UserHistoryDto> listUserHistory;
+	
 	public UserDto() {
 		
 	}
@@ -57,7 +60,7 @@ public class UserDto {
 		userDto.setFullName(request.getFullName());
 		userDto.setEmail(request.getEmail());
 		userDto.setPhone(request.getPhone());
-		userDto.setEnabled(true);
+		userDto.setEnabled("true".equals(request.getEnabled()) ? true : false);
 		userDto.setUpdatedDate(new Date(System.currentTimeMillis()));
 		userDto.setUpdatedBy(userRequest);
 		return userDto;

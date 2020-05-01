@@ -39,7 +39,7 @@ public class UserService {
 	private UserConverter userConverter;
 	
 	@Autowired
-	private RoleService roleService;
+	private UserHistoryService userHistoryService;
  
 	public ResultResponse<AllUserResponse> findAllUser() {
 		//method reference java8
@@ -78,6 +78,7 @@ public class UserService {
 				}
 				insertUserRole(roleId, userDto.getUserName());
 			}
+			userHistoryService.addRecordUser(userDto);
 			return new ResultResponse<>(HttpsStatusEnum._200.getKey(), message);
 		} catch (Exception e) {
 			log.info("Insert-Update exception...", e.toString(), e);

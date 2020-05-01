@@ -28,6 +28,9 @@ public class InsertUpdateUserRequest {
 	@JsonProperty("phone")
 	private String phone;
 	
+	@JsonProperty("enabled")
+	private String enabled;
+	
 	@JsonProperty("roles")
 	private List<String> roles;
 }
