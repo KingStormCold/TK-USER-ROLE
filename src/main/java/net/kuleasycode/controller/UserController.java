@@ -43,7 +43,10 @@ public class UserController {
 		String userRequest = AuthenticationRequestInfo.getNewInstance().getUserName();
 		String json = JsonUtil.convertObjectToJson(request);
 		log.info(userRequest + " ...insert-update... " + json);
-		return userService.insertUpdateUser(request, userRequest);
+		if (StringUtils.isEmpty(request.validate())) {
+			return userService.insertUpdateUser(request, userRequest);
+		}
+		return request.validate();
 	}
 	
 	@PreAuthorize("hasAuthority('TK-GET-USER')")
