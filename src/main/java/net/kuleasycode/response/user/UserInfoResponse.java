@@ -2,6 +2,7 @@ package net.kuleasycode.response.user;
 
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AllArgsConstructor;
@@ -20,6 +21,7 @@ public class UserInfoResponse {
 	@JsonProperty("full_name")
 	private String fullName;
 	
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss", timezone = "Asia/Bangkok")
 	@JsonProperty("created_date")
 	private Date createdDate;
 	

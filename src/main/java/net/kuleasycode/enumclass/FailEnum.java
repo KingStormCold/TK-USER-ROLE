@@ -4,7 +4,8 @@ import lombok.Getter;
 
 @Getter
 public enum FailEnum {
-	NOT_FOUND_USER("F01", "Not found user.");
+	NOT_FOUND_USER("F01", "Not found user."),
+	NOT_EMPTY("F02", "Input is not empty.");
 
 	private String key;
 	

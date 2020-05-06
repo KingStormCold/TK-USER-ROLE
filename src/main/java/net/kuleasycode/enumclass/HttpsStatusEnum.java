@@ -6,7 +6,8 @@ import lombok.Getter;
 public enum HttpsStatusEnum {
 	_200("200", "OK."),
 	_400("400", "Bad Request."),
-	_500("500", "Internal Server Error.");
+	_500("500", "Internal Server Error."),
+	_404("404", "Not found");
 
 	private String key;
 	

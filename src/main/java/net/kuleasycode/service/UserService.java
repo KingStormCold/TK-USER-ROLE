@@ -1,5 +1,6 @@
 package net.kuleasycode.service;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -16,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.kuleasycode.converter.UserConverter;
 import net.kuleasycode.dto.RoleDto;
 import net.kuleasycode.dto.UserDto;
+import net.kuleasycode.dto.UserRoleDto;
 import net.kuleasycode.entity.UserEntity;
 import net.kuleasycode.enumclass.FailEnum;
 import net.kuleasycode.enumclass.HttpsStatusEnum;
@@ -100,6 +102,38 @@ public class UserService {
 			UserDetailResponse response = UserDetailResponse.of(userDto);
 			response.setRolesOauth(roles);
 			return new ResultResponse<>(HttpsStatusEnum._200.getKey(), HttpsStatusEnum._200.getValue(), response);
+		} catch (Exception e) {
+			log.info("Insert-Update exception...", e.toString(), e);
+			return new ResultResponse<>(HttpsStatusEnum._500.getKey(), HttpsStatusEnum._500.getValue());
+		}
+	}
+	
+	public ResultResponse<String> deleteUser(final String userName) {
+		try {
+			UserDto userDto = findById(userName);
+			if (StringUtils.isEmpty(userDto)) {
+				return new ResultResponse<>(HttpsStatusEnum._404.getKey(), FailEnum.NOT_FOUND_USER.getValue());
+			}
+			List<Object> userRoles = userRepository.findByUserNameOrRoleIdInUserRole(userName, "");
+			List<UserRoleDto> listQueryDB = new ArrayList<>();
+			log.info("[START] parse Object....");
+			for (Object userRole : userRoles) {
+				Object[] value = (Object[]) userRole;
+				UserRoleDto userRoleDto = new UserRoleDto((String)value[0], (String)value[1]);
+				listQueryDB.add(userRoleDto);
+			}
+			log.info("[END] parse Object....");
+			
+			log.info("[START] Delete user role....");
+			for (UserRoleDto itemDelete: listQueryDB) {
+				userRepository.deleteUserRole(itemDelete.getRoleId(), itemDelete.getUserName());
+			}
+			log.info("[END] Delete user role....");
+			
+			log.info("[START] Delete user....");
+			userRepository.deleteById(userName);
+			log.info("[END] Delete user....");
+			return new ResultResponse<>(HttpsStatusEnum._200.getKey(), HttpsStatusEnum._200.getValue());
 		} catch (Exception e) {
 			log.info("Insert-Update exception...", e.toString(), e);
 			return new ResultResponse<>(HttpsStatusEnum._500.getKey(), HttpsStatusEnum._500.getValue());

@@ -4,6 +4,7 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -11,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.extern.slf4j.Slf4j;
+import net.kuleasycode.enumclass.FailEnum;
+import net.kuleasycode.enumclass.HttpsStatusEnum;
 import net.kuleasycode.request.user.InsertUpdateUserRequest;
 import net.kuleasycode.response.ResultResponse;
 import net.kuleasycode.response.user.AllUserResponse;
@@ -44,10 +47,24 @@ public class UserController {
 	}
 	
 	@PreAuthorize("hasAuthority('TK-GET-USER')")
-	@GetMapping(value = "/users/get-user")
-	public ResultResponse<UserDetailResponse> getUser(@RequestParam("user-name") String userName) {
+	@GetMapping(value = "/users/find-by-user-name")
+	public ResultResponse<UserDetailResponse> getUser(@RequestParam("user_name") String userName) {
 		String userRequest = AuthenticationRequestInfo.getNewInstance().getUserName();
 		log.info("get user info " + userName + " by " + userRequest);
-		return userService.getUser(userName);
+		if (!StringUtils.isEmpty(userName)) {
+			return userService.getUser(userName);
+		}
+		return new ResultResponse<>(HttpsStatusEnum._400.getKey(), FailEnum.NOT_EMPTY.getValue()); 
+	}
+	
+	@PreAuthorize("hasAuthority('TK-DELETE-USER')")
+	@GetMapping(value = "/users/delete")
+	public ResultResponse<String> deleteUser(@RequestParam("user_name") String userName) {
+		String userRequest = AuthenticationRequestInfo.getNewInstance().getUserName();
+		log.info("delete " + userName + " by " + userRequest);
+		if (!StringUtils.isEmpty(userName)) {
+			return userService.deleteUser(userName);
+		}
+		return new ResultResponse<>(HttpsStatusEnum._400.getKey(), FailEnum.NOT_EMPTY.getValue()); 
 	}
 }
