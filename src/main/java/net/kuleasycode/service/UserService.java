@@ -67,9 +67,15 @@ public class UserService {
 			UserDto userDto = findById(request.getUserName());
 			String message;
 			if (StringUtils.isEmpty(userDto)) {
+				if (StringUtils.isEmpty(request.getPassword())) {
+					return new ResultResponse<>(HttpsStatusEnum._400.getKey(), FailEnum.BAD_REQUEST_PASSWORD.getValue()); 
+				}
 				userDto = UserDto.insert(request, userRequest);
 				message = SuccessEnum.ADD_USER.getValue();
 			} else {
+				if (!StringUtils.isEmpty(request.getPassword())) {
+					return new ResultResponse<>(HttpsStatusEnum._500.getKey(), FailEnum.ERROR_PASSWORD.getValue()); 
+				}
 				userDto = UserDto.update(userDto, request, userRequest);
 				message = SuccessEnum.UPDATE_USER.getValue();
 			}
