@@ -41,10 +41,13 @@ public class InsertUpdateUserRequest {
 	@JsonProperty("roles")
 	private List<String> roles;
 	
+	@JsonProperty("req")
+	private String req;
+	
 	public ResultResponse<String> validate() {
 		String arrEnable[] = {"true", "false"};
 		if (StringUtils.isEmpty(this.userName) || StringUtils.isEmpty(this.fullName) || StringUtils.isEmpty(this.email)
-				|| StringUtils.isEmpty(this.phone) || StringUtils.isEmpty(this.enabled)) {
+				|| StringUtils.isEmpty(this.phone) || StringUtils.isEmpty(this.enabled) || StringUtils.isEmpty(this.req)) {
 			return new ResultResponse<>(HttpsStatusEnum._400.getKey(), FailEnum.NOT_EMPTY.getValue());
 		} else if (!ValidationRegex.checkPhoneNumber(this.phone)) {
 			return new ResultResponse<>(HttpsStatusEnum._400.getKey(), FailEnum.BAD_REQUEST_PHONE.getValue());

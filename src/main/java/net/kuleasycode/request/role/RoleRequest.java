@@ -22,8 +22,11 @@ public class RoleRequest {
 	@JsonProperty("description")
 	private String description;
 	
+	@JsonProperty("req")
+	private String req;
+	
 	public ResultResponse<String> validation() {
-		if (StringUtils.isEmpty(this.roleId) || StringUtils.isEmpty(this.description)) {
+		if (StringUtils.isEmpty(this.roleId) || StringUtils.isEmpty(this.description) || StringUtils.isEmpty(this.req)) {
 			return new ResultResponse<>(HttpsStatusEnum._400.getKey(), FailEnum.NOT_EMPTY.getValue());
 		}
 		return null;

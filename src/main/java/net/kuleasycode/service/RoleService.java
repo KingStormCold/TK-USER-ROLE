@@ -12,10 +12,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import lombok.extern.slf4j.Slf4j;
+import net.kuleasycode.constant.Constant;
 import net.kuleasycode.converter.RoleConverter;
 import net.kuleasycode.dto.RoleDto;
 import net.kuleasycode.dto.UserRoleDto;
 import net.kuleasycode.entity.RoleEntity;
+import net.kuleasycode.enumclass.FailEnum;
 import net.kuleasycode.enumclass.HttpsStatusEnum;
 import net.kuleasycode.enumclass.SuccessEnum;
 import net.kuleasycode.request.role.RoleRequest;
@@ -65,17 +67,29 @@ public class RoleService {
 		try {
 			RoleDto roleDto = getRole(request.getRoleId());
 			String message;
-			if (StringUtils.isEmpty(roleDto)) {
-				roleDto = new RoleDto();
+			switch (request.getReq()) {
+			case Constant.REQ_INSERT_ROLE:
+				if (!StringUtils.isEmpty(roleDto)) {
+					return new ResultResponse<>(HttpsStatusEnum._404.getKey(), FailEnum.ERROR_ROLE_EXIST.getValue());
+				}
+				roleDto.setRoleId(request.getRoleId());
+				roleDto.setDesciption(request.getDescription());
 				message = SuccessEnum.ADD_ROLE.getValue();
-			} else {
+				break;
+			case Constant.REQ_UPDATE_ROLE:
+				if (StringUtils.isEmpty(roleDto)) {
+					return new ResultResponse<>(HttpsStatusEnum._404.getKey(), FailEnum.ERROR_ROLE_NOT_FOUND.getValue());
+				}
+				roleDto.setRoleId(request.getRoleId());
+				roleDto.setDesciption(request.getDescription());
 				message = SuccessEnum.UPDATE_ROLE.getValue();
+				break;
+			default:
+				log.info("Error role by not found req...");
+				return new ResultResponse<>(HttpsStatusEnum._500.getKey(), HttpsStatusEnum._500.getValue());
 			}
-			roleDto.setRoleId(request.getRoleId());
-			roleDto.setDesciption(request.getDescription());
 			roleRepository.save(roleConverter.convertToEntity(roleDto));
 			return new ResultResponse<>(HttpsStatusEnum._200.getKey(), message);
-			
 		} catch (Exception e) {
 			log.info("insert-update role exception..." + e.toString(), e);
 			return new ResultResponse<>(HttpsStatusEnum._500.getKey(), HttpsStatusEnum._500.getValue());

@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import lombok.extern.slf4j.Slf4j;
+import net.kuleasycode.constant.Constant;
 import net.kuleasycode.converter.UserConverter;
 import net.kuleasycode.dto.RoleDto;
 import net.kuleasycode.dto.UserDto;
@@ -66,18 +67,25 @@ public class UserService {
 		try {
 			UserDto userDto = findById(request.getUserName());
 			String message;
-			if (StringUtils.isEmpty(userDto)) {
-				if (StringUtils.isEmpty(request.getPassword())) {
-					return new ResultResponse<>(HttpsStatusEnum._400.getKey(), FailEnum.BAD_REQUEST_PASSWORD.getValue()); 
+			switch (request.getReq()) {
+			case Constant.REQ_INSERT_USER:
+				if (!StringUtils.isEmpty(userDto)) {
+					return new ResultResponse<>(HttpsStatusEnum._404.getKey(), FailEnum.ERROR_USER_EXIST.getValue()); 
 				}
 				userDto = UserDto.insert(request, userRequest);
 				message = SuccessEnum.ADD_USER.getValue();
-			} else {
-				if (!StringUtils.isEmpty(request.getPassword())) {
-					return new ResultResponse<>(HttpsStatusEnum._500.getKey(), FailEnum.ERROR_PASSWORD.getValue()); 
+				break;
+				
+			case Constant.REQ_UPDATE_USER:
+				if (StringUtils.isEmpty(userDto)) {
+					return new ResultResponse<>(HttpsStatusEnum._404.getKey(), FailEnum.ERROR_USER_NOT_FOUND.getValue()); 
 				}
 				userDto = UserDto.update(userDto, request, userRequest);
 				message = SuccessEnum.UPDATE_USER.getValue();
+				break;
+			default:
+				log.info("Error user by not found req...");
+				return new ResultResponse<>(HttpsStatusEnum._500.getKey(), HttpsStatusEnum._500.getValue());
 			}
 			userRepository.save(userConverter.convertToEntity(userDto));
 			for (String roleId : request.getRoles()) {
@@ -98,7 +106,7 @@ public class UserService {
 		try {
 			UserDto userDto = findById(userName);
 			if (StringUtils.isEmpty(userDto)) {
-				return new ResultResponse<>(HttpsStatusEnum._200.getKey(), FailEnum.NOT_FOUND_USER.getValue());
+				return new ResultResponse<>(HttpsStatusEnum._200.getKey(), FailEnum.ERROR_USER_NOT_FOUND.getValue());
 			}
 			Set<RoleDto> roles = new HashSet<>();
 			for (RoleDto roleDto : userDto.getRolesOauth()) {
@@ -118,7 +126,7 @@ public class UserService {
 		try {
 			UserDto userDto = findById(userName);
 			if (StringUtils.isEmpty(userDto)) {
-				return new ResultResponse<>(HttpsStatusEnum._404.getKey(), FailEnum.NOT_FOUND_USER.getValue());
+				return new ResultResponse<>(HttpsStatusEnum._404.getKey(), FailEnum.ERROR_USER_NOT_FOUND.getValue());
 			}
 			List<Object> userRoles = userRepository.findByUserNameOrRoleIdInUserRole(userName, "");
 			List<UserRoleDto> listQueryDB = new ArrayList<>();
@@ -137,7 +145,9 @@ public class UserService {
 			log.info("[END] Delete user role....");
 			
 			log.info("[START] Delete user....");
-			userRepository.deleteById(userName);
+			userDto.setEnabled(false);
+			userRepository.save(userConverter.convertToEntity(userDto));
+			userHistoryService.addRecordUser(userDto);
 			log.info("[END] Delete user....");
 			return new ResultResponse<>(HttpsStatusEnum._200.getKey(), HttpsStatusEnum._200.getValue());
 		} catch (Exception e) {

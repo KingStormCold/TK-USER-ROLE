@@ -35,5 +35,4 @@ public class UserHistoryService {
 		result.setEnabled(userDto.isEnabled());
 		userHistoryRepository.save(userHistoryConverter.convertToEntity(result));
 	}
-
 }
